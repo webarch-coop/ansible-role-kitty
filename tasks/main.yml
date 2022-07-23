@@ -41,6 +41,14 @@
 
     - name: Check GPG sig
       ansible.builtin.command: "gpg --verify /usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+      register: kitty_gpg_verify
+      failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
+
+    - name: Unarchive Kitty
+      ansible.builtin.unarchive:
+        src: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
+        dest: /usr/local
+        remote_src: true
 
   tags:
     - kitty
