@@ -1,6 +1,6 @@
 # Kitty
 
-Ansible role to install Kitty from GitHub.
+Ansible role to install and update to the latest version of [Kitty](https://github.com/kovidgoyal/kitty).
 
 This role is designed to be run without `become`, as a non-root user, you might want to copy the following to `/usr/share/applications/kitty.desktop` and `chmod 755` it:
 
@@ -29,3 +29,7 @@ else
   exit 1
 fi
 ```
+
+## Remote servers
+
+Install the [kitty-terminfo](https://packages.debian.org/search?keywords=kitty-terminfo) package and see [the SSH documentation](https://sw.kovidgoyal.net/kitty/kittens/ssh/).
