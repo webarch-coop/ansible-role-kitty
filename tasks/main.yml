@@ -93,6 +93,7 @@
 
       when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( ( kitty_upgradable is defined ) and ( kitty_upgradable | bool ) )
 
+  when: kitty | bool
   tags:
     - kitty
 ...
