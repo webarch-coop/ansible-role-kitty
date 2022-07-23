@@ -62,6 +62,12 @@
             kitty_upgradable: true
           when: kitty_installed is version(kitty_latest, '<')
 
+        - name: The latest version of Kitty is already installed
+          ansible.builtin.debug:
+            msg:
+              - "The latest version of Kitty, {{ kitty_latest }}, is alreay installed."
+          when: kitty_installed is version(kitty_latest, '==')
+
       when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
 
     - name: Install Kitty
