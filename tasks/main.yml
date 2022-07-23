@@ -25,7 +25,7 @@
 
     - name: Set a fact for the latest version of Kitty
       ansible.builtin.set_fact:
-        kitty_version_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+        kitty_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
 
     - name: Check if Kitty is installed
       ansible.builtin.stat:
@@ -57,25 +57,25 @@
 
         - name: Download Kitty GPG sig
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
-            dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_latest }}/kitty-{{ kitty_latest }}-x86_64.txz.sig"
+            dest: "/usr/local/kitty-{{ kitty_latest }}-x86_64.txz.sig"
             mode: 0644
 
         - name: Download Kitty
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz"
-            dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_latest }}/kitty-{{ kitty_latest }}-x86_64.txz"
+            dest: "/usr/local/kitty-{{ kitty_latest }}-x86_64.txz"
             mode: 0644
 
         - name: Check GPG sig
-          ansible.builtin.command: "gpg --verify /usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+          ansible.builtin.command: "gpg --verify /usr/local/kitty-{{ kitty_latest }}-x86_64.txz.sig"
           register: kitty_gpg_verify
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
         - name: Unarchive Kitty
           ansible.builtin.unarchive:
-            src: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
+            src: "/usr/local/kitty-{{ kitty_latest }}-x86_64.txz"
             dest: /usr/local
             remote_src: true
 
