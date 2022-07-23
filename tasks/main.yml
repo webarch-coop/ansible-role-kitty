@@ -91,22 +91,6 @@
             dest: "{{ kitty_local }}"
             remote_src: true
 
-        - name: Kitty deb package absent
-          ansible.builtin.apt:
-            apt:
-              pkg:
-                - kitty
-            state: absent
-            autoremove: true
-            autoclean: true
-
-        - name: Kitty terminfo package present
-          ansible.builtin.apt:
-            apt:
-              pkg:
-                - kitty-terminfo
-            state: present
-
       when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( ( kitty_upgradable is defined ) and ( kitty_upgradable | bool ) )
 
   tags:
