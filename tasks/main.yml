@@ -45,6 +45,11 @@
           ansible.builtin.set_fact:
             kitty_installed: "{{ kitty_installed_version.stdout.split(' ')[1] | trim | string }}"
 
+        - name: Set a fact to indicate that Kitty can be upgraded
+          ansible.builtin.set_fact:
+            kitty_upgradable: true
+          when: kitty_installed is version(kitty_latest, '<')
+
       when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
 
     - name: Install Kitty
@@ -90,7 +95,7 @@
                 - kitty-terminfo
             state: present
 
-      when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( ( kitty_installed is defined ) and ( kitty_installed is version(kitty_latest, '<') ) )
+      when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( ( kitty_upgradable is defined ) and ( kitty_upgradable | bool ) )
 
   tags:
     - kitty
