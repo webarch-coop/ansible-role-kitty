@@ -1,0 +1,6 @@
+---
+kitty: true
+kitty_bin: ~/bin
+kitty_local: ~/.local
+kitty_tmp: ~/tmp
+...
