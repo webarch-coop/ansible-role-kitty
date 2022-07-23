@@ -1,0 +1,47 @@
+---
+- name: Install Kitty
+  block:
+
+    - name: GPG public key present
+      ansible.builtin.copy:
+        src: kovid.gpg
+        dest: /root/kovid.gpg
+        mode: 0600
+
+    - name: GPG key imported
+      ansible.builtin.command: gpg --import /root/kovid.gpg
+      register: kitty_gpg_import
+      changed_when: ( "unchanged" not in kitty_gpg_import.stderr ) or ( "not changed" not in kitty_gpg_import.stderr )
+
+    - name: Check the latest version of Kitty
+      ansible.builtin.uri:
+        url: https://github.com/kovidgoyal/kitty/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      changed_when: false
+      register: kitty_headers
+
+    - name: Set a fact for the latest version of Kitty
+      ansible.builtin.set_fact:
+        kitty_version_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+
+    - name: Download Kitty GPG sig
+      ansible.builtin.get_url:
+        url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+        dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+        mode: 0644
+
+    - name: Download Kitty
+      ansible.builtin.get_url:
+        url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz"
+        dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
+        mode: 0644
+
+    - name: Check GPG sig
+      ansible.builtin.command: "gpg --verify /usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+
+  tags:
+    - kitty
+...
