@@ -2,14 +2,26 @@
 - name: Install Kitty
   block:
 
+    - name: Directories present
+      ansible.builtin.file:
+        path: "{{ dir }}"
+        state: directory
+        mode: 0750
+      loop:
+        - "{{ kitty_bin }}"
+        - "{{ kitty_local }}"
+        - "{{ kitty_tmp }}"
+      loop_control:
+        loop_var: dir
+
     - name: GPG public key present
       ansible.builtin.copy:
         src: kovid.gpg
-        dest: /root/kovid.gpg
+        dest: "{{ kitty_tmp }}/kovid.gpg"
         mode: 0600
 
     - name: GPG key imported
-      ansible.builtin.command: gpg --import /root/kovid.gpg
+      ansible.builtin.command: "gpg --import {{ kitty_tmp }}/kovid.gpg"
       register: kitty_gpg_import
       changed_when: ( "unchanged" not in kitty_gpg_import.stderr ) or ( "not changed" not in kitty_gpg_import.stderr )
 
@@ -29,14 +41,14 @@
 
     - name: Check if Kitty is installed
       ansible.builtin.stat:
-        path: /usr/local/bin/kitty
+        path: "{{ kitty_bin }}/kitty"
       register: kitty_present
 
     - name: Check Kitty version
       block:
 
         - name: Check Kitty version
-          ansible.builtin.command: /usr/local/bin/kitty --version
+          ansible.builtin.command: "{{ kitty_bin }}/kitty --version"
           changed_when: false
           check_mode: false
           register: kitty_installed_version
@@ -58,25 +70,25 @@
         - name: Download Kitty GPG sig
           ansible.builtin.get_url:
             url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_latest }}/kitty-{{ kitty_latest }}-x86_64.txz.sig"
-            dest: "/usr/local/kitty-{{ kitty_latest }}-x86_64.txz.sig"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz.sig"
             mode: 0644
 
         - name: Download Kitty
           ansible.builtin.get_url:
             url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_latest }}/kitty-{{ kitty_latest }}-x86_64.txz"
-            dest: "/usr/local/kitty-{{ kitty_latest }}-x86_64.txz"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz"
             mode: 0644
 
         - name: Check GPG sig
-          ansible.builtin.command: "gpg --verify /usr/local/kitty-{{ kitty_latest }}-x86_64.txz.sig"
+          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz.sig"
           register: kitty_gpg_verify
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
         - name: Unarchive Kitty
           ansible.builtin.unarchive:
-            src: "/usr/local/kitty-{{ kitty_latest }}-x86_64.txz"
-            dest: /usr/local
+            src: "{{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz"
+            dest: "{{ kitty_local }}"
             remote_src: true
 
         - name: Kitty deb package absent
