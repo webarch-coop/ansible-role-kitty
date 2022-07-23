@@ -27,28 +27,70 @@
       ansible.builtin.set_fact:
         kitty_version_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
 
-    - name: Download Kitty GPG sig
-      ansible.builtin.get_url:
-        url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
-        dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
-        mode: 0644
+    - name: Check if Kitty is installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/kitty
+      register: kitty_present
 
-    - name: Download Kitty
-      ansible.builtin.get_url:
-        url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz"
-        dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
-        mode: 0644
+    - name: Check Kitty version
+      block:
 
-    - name: Check GPG sig
-      ansible.builtin.command: "gpg --verify /usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
-      register: kitty_gpg_verify
-      failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
+        - name: Check Kitty version
+          ansible.builtin.command: /usr/local/bin/kitty --version
+          changed_when: false
+          check_mode: false
+          register: kitty_installed_version
 
-    - name: Unarchive Kitty
-      ansible.builtin.unarchive:
-        src: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
-        dest: /usr/local
-        remote_src: true
+        - name: Set a variable for the installed version of Kitty
+          ansible.builtin.set_fact:
+            kitty_installed: "{{ kitty_installed_version.stdout | split(' ')[1] | trim | string }}"
+
+      when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
+
+    - name: Install Kitty
+      block:
+
+        - name: Download Kitty GPG sig
+          ansible.builtin.get_url:
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+            dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+            mode: 0644
+
+        - name: Download Kitty
+          ansible.builtin.get_url:
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_version_latest }}/kitty-{{ kitty_version_latest }}-x86_64.txz"
+            dest: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
+            mode: 0644
+
+        - name: Check GPG sig
+          ansible.builtin.command: "gpg --verify /usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz.sig"
+          register: kitty_gpg_verify
+          changed_when: false
+          failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
+
+        - name: Unarchive Kitty
+          ansible.builtin.unarchive:
+            src: "/usr/local/kitty-{{ kitty_version_latest }}-x86_64.txz"
+            dest: /usr/local
+            remote_src: true
+
+        - name: Kitty deb package absent
+          ansible.builtin.apt:
+            apt:
+              pkg:
+                - kitty
+            state: absent
+            autoremove: true
+            autoclean: true
+
+        - name: Kitty terminfo package present
+          ansible.builtin.apt:
+            apt:
+              pkg:
+                - kitty-terminfo
+            state: present
+
+      when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( kitty_installed is version(kitty_latest, '<')
 
   tags:
     - kitty
