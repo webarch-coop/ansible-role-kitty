@@ -90,7 +90,7 @@
                 - kitty-terminfo
             state: present
 
-      when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( kitty_installed is version(kitty_latest, '<')
+      when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( ( kitty_installed is defined ) and ( kitty_installed is version(kitty_latest, '<') ) )
 
   tags:
     - kitty
