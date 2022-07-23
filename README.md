@@ -1,6 +1,6 @@
 # Kitty
 
-Ansible role to install and update to the [latest](https://github.com/kovidgoyal/kitty/releases/latest) version of [Kitty](https://github.com/kovidgoyal/kitty).
+Ansible role to install and update to the [latest](https://github.com/kovidgoyal/kitty/releases/latest) version of [Kitty](https://github.com/kovidgoyal/kitty) in `~/.local`.
 
 This role is designed to be run without `become`, as a non-root user, you might want to copy the following to `/usr/share/applications/kitty.desktop` and `chmod 755` it:
 
