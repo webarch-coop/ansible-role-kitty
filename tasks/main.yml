@@ -43,7 +43,7 @@
 
         - name: Set a variable for the installed version of Kitty
           ansible.builtin.set_fact:
-            kitty_installed: "{{ kitty_installed_version.stdout | split(' ')[1] | trim | string }}"
+            kitty_installed: "{{ kitty_installed_version.stdout.split(' ')[1] | trim | string }}"
 
       when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
 
