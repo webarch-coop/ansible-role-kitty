@@ -74,7 +74,7 @@
           when: kitty_installed is version(kitty_latest, '==')
 
         - name: Set Kitty version required
-          absible.builtin.set_fact:
+          ansible.builtin.set_fact:
             kitty_required: "{{ kitty_latest }}"
           when:
             - kitty_version == "latest"
@@ -83,14 +83,14 @@
       when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
 
     - name: Set Kitty version required when Kitty is not installed
-      absible.builtin.set_fact:
+      ansible.builtin.set_fact:
         kitty_required: "{{ kitty_latest }}"
       when:
         - ( kitty_version == "latest" )
         - ( kitty_present is not defined ) or ( not kitty_present.stat.exists | bool )
 
     - name: Set Kitty version required when a specific version is required
-      absible.builtin.set_fact:
+      ansible.builtin.set_fact:
         kitty_required: "{{ kitty_version }}"
       when:
         - kitty_version != "latest"
