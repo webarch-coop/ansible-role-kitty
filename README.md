@@ -33,3 +33,11 @@ fi
 ## Remote servers
 
 Install the [kitty-terminfo](https://packages.debian.org/search?keywords=kitty-terminfo) package and see [the SSH documentation](https://sw.kovidgoyal.net/kitty/kittens/ssh/).
+
+## Config tweaks
+
+To ensure that ctrl+shift+v goes to Vim add the following to `~/.config/kitty/kitty.conf`:
+
+```
+map ctrl+shift+v send_text all \x16
+```
