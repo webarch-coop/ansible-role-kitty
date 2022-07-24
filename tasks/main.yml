@@ -120,19 +120,20 @@
             remote_src: true
 
       when:
+        - kitty_version != "nightly"
         - kitty_required is defined
         - kitty_required is version('0.20.3', '>')
 
     - name: Install Kitty nightly
       block:
 
-        - name: Download Kitty GPG sig
+        - name: Download Kitty nightly GPG sig
           ansible.builtin.get_url:
             url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz.sig"
             dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz.sig"
             mode: 0644
 
-        - name: Download Kitty
+        - name: Download nightly Kitty
           ansible.builtin.get_url:
             url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz"
             dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
@@ -144,15 +145,13 @@
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
-        - name: Unarchive Kitty
+        - name: Unarchive Kitty nightly
           ansible.builtin.unarchive:
             src: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
             dest: "{{ kitty_local }}"
             remote_src: true
 
-      when:
-        - kitty_required is defined
-        - kitty_required is version('0.20.3', '>')
+      when: kitty_version == "nightly"
 
   when: kitty | bool
   tags:
