@@ -30,24 +30,19 @@
       register: kitty_gpg_import
       changed_when: ( "unchanged" not in kitty_gpg_import.stderr ) or ( "not changed" not in kitty_gpg_import.stderr )
 
-    - name: Kitty latest tasks
-      block:
+    - name: Check the latest version of Kitty
+      ansible.builtin.uri:
+        url: https://github.com/kovidgoyal/kitty/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      changed_when: false
+      register: kitty_headers
 
-        - name: Check the latest version of Kitty
-          ansible.builtin.uri:
-            url: https://github.com/kovidgoyal/kitty/releases/latest
-            method: HEAD
-            status_code: 302
-            follow_redirects: none
-          check_mode: false
-          changed_when: false
-          register: kitty_headers
-
-        - name: Set a fact for the latest version of Kitty
-          ansible.builtin.set_fact:
-            kitty_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
-
-      when: kitty_version == "latest"
+    - name: Set a fact for the latest version of Kitty
+      ansible.builtin.set_fact:
+        kitty_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
 
     - name: Check if Kitty is installed
       ansible.builtin.stat:
