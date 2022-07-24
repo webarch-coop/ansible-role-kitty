@@ -78,7 +78,7 @@
             kitty_required: "{{ kitty_latest }}"
           when:
             - kitty_version == "latest"
-            - kitty_installed is version('kitty_latest', '<')
+            - kitty_installed is version(kitty_latest, '<')
 
       when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
 
