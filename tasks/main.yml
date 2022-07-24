@@ -132,12 +132,14 @@
             url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz.sig"
             dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz.sig"
             mode: 0644
+          register: kitty_nightly_txz_sig
 
         - name: Download nightly Kitty
           ansible.builtin.get_url:
             url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz"
             dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
             mode: 0644
+          register: kitty_nightly_txz
 
         - name: Check GPG sig
           ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz.sig"
@@ -150,6 +152,7 @@
             src: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
             dest: "{{ kitty_local }}"
             remote_src: true
+          when: ( kitty_nightly_txz_sig.changed ) or ( kitty_nightly_txz.changed )
 
       when: kitty_version == "nightly"
 
