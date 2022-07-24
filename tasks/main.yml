@@ -11,7 +11,7 @@
       ansible.builtin.file:
         path: "{{ dir }}"
         state: directory
-        mode: 0750
+        mode: 0755
       loop:
         - "{{ kitty_bin }}"
         - "{{ kitty_local }}"
