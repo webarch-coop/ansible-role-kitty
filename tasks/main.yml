@@ -62,10 +62,10 @@
           ansible.builtin.set_fact:
             kitty_installed: "{{ kitty_installed_version.stdout.split(' ')[1] | trim | string }}"
 
-        - name: The latest version of Kitty is already installed
+        - name: The latest version of Kitty is installed
           ansible.builtin.debug:
             msg:
-              - "The latest version of Kitty, {{ kitty_latest }}, is alreay installed."
+              - "The latest version of Kitty, {{ kitty_latest }}, is installed."
           when: kitty_installed is version(kitty_latest, '==')
 
         - name: Set Kitty version required
