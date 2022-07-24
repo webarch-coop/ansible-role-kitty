@@ -36,7 +36,7 @@ Install the [kitty-terminfo](https://packages.debian.org/search?keywords=kitty-t
 
 ## Config tweaks
 
-To ensure that ctrl+shift+v goes to Vim add the following to `~/.config/kitty/kitty.conf`:
+To ensure that [ctrl+shift+v goes to Vim](https://github.com/kovidgoyal/kitty/discussions/5003#discussioncomment-2617442) add the following to `~/.config/kitty/kitty.conf`:
 
 ```
 map ctrl+shift+v send_text all \x16
