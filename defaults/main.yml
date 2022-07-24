@@ -3,4 +3,5 @@ kitty: true
 kitty_bin: ~/.local/bin
 kitty_local: ~/.local
 kitty_tmp: ~/tmp
+kitty_version: latest
 ...

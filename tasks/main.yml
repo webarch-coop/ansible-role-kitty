@@ -2,6 +2,11 @@
 - name: Install Kitty
   block:
 
+    - name: Check the Kitty version variable
+      ansible.builtin.assert:
+        that:
+          - ( kitty_version == "latest" ) or ( kitty_version == "nightly" ) or ( kitty_version is version('0.20.3', '>') )
+
     - name: Directories present
       ansible.builtin.file:
         path: "{{ dir }}"
@@ -25,19 +30,24 @@
       register: kitty_gpg_import
       changed_when: ( "unchanged" not in kitty_gpg_import.stderr ) or ( "not changed" not in kitty_gpg_import.stderr )
 
-    - name: Check the latest version of Kitty
-      ansible.builtin.uri:
-        url: https://github.com/kovidgoyal/kitty/releases/latest
-        method: HEAD
-        status_code: 302
-        follow_redirects: none
-      check_mode: false
-      changed_when: false
-      register: kitty_headers
+    - name: Kitty latest tasks
+      block:
 
-    - name: Set a fact for the latest version of Kitty
-      ansible.builtin.set_fact:
-        kitty_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+        - name: Check the latest version of Kitty
+          ansible.builtin.uri:
+            url: https://github.com/kovidgoyal/kitty/releases/latest
+            method: HEAD
+            status_code: 302
+            follow_redirects: none
+          check_mode: false
+          changed_when: false
+          register: kitty_headers
+
+        - name: Set a fact for the latest version of Kitty
+          ansible.builtin.set_fact:
+            kitty_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+
+      when: kitty_version == "latest"
 
     - name: Check if Kitty is installed
       ansible.builtin.stat:
@@ -57,47 +67,97 @@
           ansible.builtin.set_fact:
             kitty_installed: "{{ kitty_installed_version.stdout.split(' ')[1] | trim | string }}"
 
-        - name: Set a fact to indicate that Kitty can be upgraded
-          ansible.builtin.set_fact:
-            kitty_upgradable: true
-          when: kitty_installed is version(kitty_latest, '<')
-
         - name: The latest version of Kitty is already installed
           ansible.builtin.debug:
             msg:
               - "The latest version of Kitty, {{ kitty_latest }}, is alreay installed."
           when: kitty_installed is version(kitty_latest, '==')
 
+        - name: Set Kitty version required
+          absible.builtin.set_fact:
+            kitty_required: "{{ kitty_latest }}"
+          when:
+            - kitty_version == "latest"
+            - kitty_installed is version('kitty_latest', '<')
+
       when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
 
-    - name: Install Kitty
+    - name: Set Kitty version required when Kitty is not installed
+      absible.builtin.set_fact:
+        kitty_required: "{{ kitty_latest }}"
+      when:
+        - ( kitty_version == "latest" )
+        - ( kitty_present is not defined ) or ( not kitty_present.stat.exists | bool )
+
+    - name: Set Kitty version required when a specific version is required
+      absible.builtin.set_fact:
+        kitty_required: "{{ kitty_version }}"
+      when:
+        - kitty_version != "latest"
+        - kitty_version != "nightly"
+        - kitty_version is version('0.20.3', '>')
+
+    - name: Install a specific version of Kitty
       block:
 
         - name: Download Kitty GPG sig
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_latest }}/kitty-{{ kitty_latest }}-x86_64.txz.sig"
-            dest: "{{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz.sig"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-x86_64.txz.sig"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz.sig"
             mode: 0644
 
         - name: Download Kitty
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_latest }}/kitty-{{ kitty_latest }}-x86_64.txz"
-            dest: "{{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-x86_64.txz"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz"
             mode: 0644
 
         - name: Check GPG sig
-          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz.sig"
+          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz.sig"
           register: kitty_gpg_verify
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
         - name: Unarchive Kitty
           ansible.builtin.unarchive:
-            src: "{{ kitty_tmp }}/kitty-{{ kitty_latest }}-x86_64.txz"
+            src: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz"
             dest: "{{ kitty_local }}"
             remote_src: true
 
-      when: ( ( kitty_present is defined ) and ( not kitty_present.stat.exists | bool ) ) or ( ( kitty_upgradable is defined ) and ( kitty_upgradable | bool ) )
+      when:
+        - kitty_required is defined
+        - kitty_required is version('0.20.3', '>')
+
+    - name: Install Kitty nightly
+      block:
+
+        - name: Download Kitty GPG sig
+          ansible.builtin.get_url:
+            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz.sig"
+            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz.sig"
+            mode: 0644
+
+        - name: Download Kitty
+          ansible.builtin.get_url:
+            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz"
+            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
+            mode: 0644
+
+        - name: Check GPG sig
+          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz.sig"
+          register: kitty_gpg_verify
+          changed_when: false
+          failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
+
+        - name: Unarchive Kitty
+          ansible.builtin.unarchive:
+            src: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
+            dest: "{{ kitty_local }}"
+            remote_src: true
+
+      when:
+        - kitty_required is defined
+        - kitty_required is version('0.20.3', '>')
 
   when: kitty | bool
   tags:
