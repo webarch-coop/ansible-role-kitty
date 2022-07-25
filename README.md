@@ -1,6 +1,8 @@
 # Kitty
 
-Ansible role to install and update to the [latest](https://github.com/kovidgoyal/kitty/releases/latest) version of [Kitty](https://github.com/kovidgoyal/kitty) in `~/.local`.
+Ansible role to install update [Kitty](https://github.com/kovidgoyal/kitty) in `~/.local`, tested on Debian, will no doubt work on Ubuntu.
+
+This repo can be used to install and update the [latest](https://github.com/kovidgoyal/kitty/releases/latest) version, or the [nighlty](https://github.com/kovidgoyal/kitty/releases/tag/nightly) version or a [specific version](https://github.com/kovidgoyal/kitty/releases) of [Kitty](https://github.com/kovidgoyal/kitty) equat to or newer than `0.20.3'` (earlier versions did not have GPG signatures).
 
 This role is designed to be run without `become`, as a non-root user, you might want to copy the following to `/usr/share/applications/kitty.desktop` and `chmod 755` it:
 
