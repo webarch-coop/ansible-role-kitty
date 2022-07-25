@@ -119,4 +119,4 @@ The primary URL of this repo is [`https://git.coop/webarch/kitty`](https://git.c
 
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/kitty/-/releases).
 
-This role can also be used with the [localhost repo](https://git.coop/webarch/localhost) to install `kitty` locally.
+This role can also be used with the [localhost repo](https://git.coop/webarch/localhost) to install `kitty` locally however not that it would need some changes so that it doesn't prompt for the `sudo` password and then run as `root`.
