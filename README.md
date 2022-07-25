@@ -14,7 +14,7 @@ There are four [default variables](defaults/main.yml):
 | `kitty_bin`          | `~/.local/bin`   | The directory in which the `kitty` binary resides                         |
 | `kitty_local`        | `~/.local`       | The directory that the Kitty archive is extracted into                    |
 | `kitty_tmp`          | `~/tmp`          | The directory that the Kitty archive and GPG signature to downloaded into |
-| `kitty_version`      | `latest`         | Valid options are `latest`, `nightly` and a version number, eg `0.20.3`   |
+| `kitty_version`      | `latest`         | Valid options are `latest`, `nightly` or a version number, eg `0.20.3`    |
 
 ## Using this role
 
