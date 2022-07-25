@@ -71,7 +71,7 @@ ansible-galaxy install -r requirements.yml
 ansible-playbook localhost.yml
 ```
 
-## Desktop icon and PATH
+## Desktop icon and $PATH
 
 This role is designed to be run without `become`, as a non-root user, you might want to copy the following to `/usr/share/applications/kitty.desktop` and `chmod 755` it:
 
