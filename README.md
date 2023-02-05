@@ -1,105 +1,40 @@
-# Kitty
+# Webarchitects Ansible Kitty Role
 
-Ansible role to install update [Kitty](https://github.com/kovidgoyal/kitty) in `~/.local`, tested on Debian, will no doubt work on Ubuntu.
+[![pipeline status](https://git.coop/webarch/kitty/badges/main/pipeline.svg)](https://git.coop/webarch/kitty/-/commits/main)
+
+Ansible role to install update [Kitty](https://github.com/kovidgoyal/kitty) in `~/.local` on Debian and Ubuntu.
 
 This repo can be used to install and update the [latest version](https://github.com/kovidgoyal/kitty/releases/latest), or the [nightly version](https://github.com/kovidgoyal/kitty/releases/tag/nightly) or a [specific version](https://github.com/kovidgoyal/kitty/releases) of [Kitty](https://github.com/kovidgoyal/kitty) equal to or newer than `0.20.3` (earlier versions did not have GPG signatures).
 
-## Defaults
+## Usage
 
-There are four [default variables](defaults/main.yml):
-
-| Variable name        | Default value    | Comment                                                                   |
-|----------------------|------------------|---------------------------------------------------------------------------|
-| `kitty`              | `true`           | If this variable is set to `false` all tasks in this role will be skipped |
-| `kitty_bin`          | `~/.local/bin`   | The directory in which the `kitty` binary resides                         |
-| `kitty_local`        | `~/.local`       | The directory that the Kitty archive is extracted into                    |
-| `kitty_tmp`          | `~/tmp`          | The directory that the Kitty archive and GPG signature to downloaded into |
-| `kitty_version`      | `latest`         | Valid options are `latest`, `nightly` or a version number, eg `0.20.3`    |
-
-## Using this role
-
-The minimal Ansible configuration needed to use this role is a directory containing a `hosts.yml` file containing:
-
-```yml
----
-all:
-  children:
-    localhosts:
-      hosts:
-        localhost:
-...
-```
-
-A `localhost.yml` file containing:
-
-```yml
---
-- name: Install packages on the localhost using Ansible
-  hosts:
-    - localhosts
-  connection: local
-  vars:
-    kitty_version: nightly
-  roles:
-    - kitty
-...
-```
-
-And a `requirements.yml` file containing:
-
-```yml
----
-- name: kitty
-  src: https://github.com/webarch-coop/ansible-role-kitty.git
-  version: main
-  scm: git
-...
-```
-
-And an `ansible.cfg` file containing:
-
-```ini
-[defaults]
-inventory = hosts.yml
-roles_path = galaxy/roles
-```
-
-Then to install Kitty run the following comands:
+The suggested method for using this role is via the [localhost repo](https://git.coop/webarch/localhost) which contains a [kitty.sh](https://git.coop/webarch/localhost/-/blob/main/kitty.sh) script that will download this role and run it, for example:
 
 ```bash
-ansible-galaxy install -r requirements.yml
-ansible-playbook localhost.yml
+git clone https://git.coop/webarch/localhost.git
+cd localhost
+./kitty.sh --check
+./kitty.sh
 ```
 
-## Desktop icon and $PATH
-
-This role is designed to be run without `become`, as a non-root user, you might want to copy the following to `/usr/share/applications/kitty.desktop` and `chmod 755` it:
-
-```ini
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=kitty
-GenericName=Terminal emulator
-Comment=Fast, feature-rich, GPU based terminal
-TryExec=kitty
-Exec=$HOME/.local/bin/kitty
-Icon=$HOME/.local/share/icons/hicolor/256x256/apps/kitty.png
-Categories=System;TerminalEmulator;
-```
-
-And also create a `/usr/local/bin/kitty` file and `chmod 755` it so that `kitty` is in your `$PATH`:
+This role is designed to be run by a non-root user, it will install Kitty to `~/.local/bin`, if `~/.local/bin` is not in your `$PATH` environmental variable add the following to your `~/.bash_profile` or whichever file sets your `$PATH` environmental variable when you login:
 
 ```bash
-#!/usr/bin/env bash
-
-if [[ -f "${HOME}/.local/bin/kitty" ]]; then
-  ${HOME}/.local/bin/kitty
-else
-  echo "Sorry, kitty could not be found"
-  exit 1
-fi
+PATH="${HOME}/.local/bin:${PATH}"
+export PATH="${PATH}"
 ```
+
+## Role variables
+
+See the [defaults/main.yml](defaults/main.yml) file for the default variables, the [vars/main.yml](vars/main.yml) file for the preset variables and the [meta/argument_specs.yml](meta/argument_specs.yml) file for the variable specification.
+
+| Variable name        | Default value        | Comment                                                                   |
+|----------------------|----------------------|---------------------------------------------------------------------------|
+| `kitty`              | `true`               | If this variable is set to `false` all tasks in this role will be skipped |
+| `kitty_bin`          | `~/.local/bin`       | The directory in which the `kitty` binary resides                         |
+| `kitty_local`        | `~/.local/kitty.app` | The directory that the Kitty archive is extracted into                    |
+| `kitty_tmp`          | `~/tmp`              | The directory that the Kitty archive and GPG signature to downloaded into |
+| `kitty_version`      | `latest`             | Valid options are `latest`, `nightly` or a version number, eg `0.20.3`    |
 
 ## Remote servers
 
@@ -120,3 +55,9 @@ The primary URL of this repo is [`https://git.coop/webarch/kitty`](https://git.c
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/kitty/-/releases).
 
 This role can also be used with the [localhost repo](https://git.coop/webarch/localhost) to install `kitty` locally however not that it would need some changes so that it doesn't prompt for the `sudo` password and then run as `root`.
+
+## Copyright
+
+Copyright 2022-2023 Chris Croome, &lt;[chris@webarchitects.co.uk](mailto:chris@webarchitects.co.uk)&gt;.
+
+This role is released under [the same terms as Ansible itself](https://github.com/ansible/ansible/blob/devel/COPYING), the [GNU GPLv3](LICENSE).

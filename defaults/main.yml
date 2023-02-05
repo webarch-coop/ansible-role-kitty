@@ -1,7 +1,16 @@
+# Copyright 2022-2023 Chris Croome
+#
+# This file is part of the Webarchitects Kitty Ansible role.
+#
+# The Webarchitects Kitty Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Kitty Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 kitty: true
 kitty_bin: ~/.local/bin
-kitty_local: ~/.local
+kitty_local: ~/.local/kitty-app
 kitty_tmp: ~/tmp
 kitty_version: latest
 ...

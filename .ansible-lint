@@ -1,17 +1,16 @@
+# Copyright 2022-2023 Chris Croome
+#
+# This file is part of the Webarchitects Kitty Ansible role.
+#
+# The Webarchitects Kitty Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Kitty Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-# https://docs.ansible.com/ansible-lint/rules/default_rules.html
+# https://ansible-lint.readthedocs.io/rules/
 skip_list:
-  # Lines should be no longer than 160 chars
-  - "204"
-  # Commands should not change things if nothing needs doing
-  - "301"
-  # chown used in place of argument owner to file module
-  - "302"
-  # Using command rather than module
-  - "303"
-  # Shells that use pipes should set the pipefail option
-  # - "306"
-  # Tasks that run when changed should likely be handlers
-  - "503"
+  - key-order[task]
+  - schema[meta]
 # vim: syntax=yaml
 ...

@@ -1,34 +1,48 @@
+# Copyright 2022-2023 Chris Croome
+#
+# This file is part of the Webarchitects Kitty Ansible role.
+#
+# The Webarchitects Kitty Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Kitty Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Install Kitty
   block:
 
     - name: Check the Kitty version variable
       ansible.builtin.assert:
-        that:
-          - ( kitty_version == "latest" ) or ( kitty_version == "nightly" ) or ( kitty_version is version('0.20.3', '>') )
+        that: >-
+          ( kitty_version == "latest" ) or
+          ( kitty_version == "nightly" ) or
+          ( kitty_version is version('0.20.3', '>') )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Directories present
       ansible.builtin.file:
-        path: "{{ dir }}"
+        path: "{{ kitty_dir }}"
         state: directory
-        mode: 0755
+        mode: 0750
       loop:
         - "{{ kitty_bin }}"
         - "{{ kitty_local }}"
         - "{{ kitty_tmp }}"
       loop_control:
-        loop_var: dir
+        loop_var: kitty_dir
 
     - name: GPG public key present
       ansible.builtin.copy:
         src: kovid.gpg
         dest: "{{ kitty_tmp }}/kovid.gpg"
-        mode: 0600
+        mode: 0640
 
     - name: GPG key imported
       ansible.builtin.command: "gpg --import {{ kitty_tmp }}/kovid.gpg"
       register: kitty_gpg_import
-      changed_when: ( "unchanged" not in kitty_gpg_import.stderr ) or ( "not changed" not in kitty_gpg_import.stderr )
+      changed_when: >-
+        ( "unchanged" not in kitty_gpg_import.stderr_lines | last ) or
+        ( "not changed" not in kitty_gpg_import.stderr_lines | last )
 
     - name: Check the latest version of Kitty
       ansible.builtin.uri:
@@ -64,8 +78,7 @@
 
         - name: The latest version of Kitty is installed
           ansible.builtin.debug:
-            msg:
-              - "The latest version of Kitty, {{ kitty_latest }}, is installed."
+            msg: "The latest version of Kitty, {{ kitty_latest }}, is installed."
           when: kitty_installed is version(kitty_latest, '==')
 
         - name: Set Kitty version required
@@ -75,7 +88,9 @@
             - kitty_version == "latest"
             - kitty_installed is version(kitty_latest, '<')
 
-      when: ( kitty_present is defined ) and ( kitty_present.stat.exists | bool )
+      when:
+        - kitty_present is defined
+        - kitty_present.stat.exists | bool
 
     - name: Set Kitty version required when Kitty is not installed
       ansible.builtin.set_fact:
@@ -97,25 +112,25 @@
 
         - name: Download Kitty GPG sig
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-x86_64.txz.sig"
-            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz.sig"
-            mode: 0644
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+            mode: 0640
 
         - name: Download Kitty
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-x86_64.txz"
-            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz"
-            mode: 0644
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
+            mode: 0640
 
         - name: Check GPG sig
-          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz.sig"
+          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
           register: kitty_gpg_verify
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
         - name: Unarchive Kitty
           ansible.builtin.unarchive:
-            src: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-x86_64.txz"
+            src: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
             dest: "{{ kitty_local }}"
             remote_src: true
 
@@ -129,32 +144,58 @@
 
         - name: Download Kitty nightly GPG sig
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz.sig"
-            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz.sig"
-            mode: 0644
+            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+            mode: 0640
           register: kitty_nightly_txz_sig
 
         - name: Download nightly Kitty
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz"
-            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
-            mode: 0644
+            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-{{ kitty_arch[ansible_architecture] }}.txz"
+            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
+            mode: 0640
           register: kitty_nightly_txz
 
         - name: Check GPG sig
-          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz.sig"
+          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
           register: kitty_gpg_verify
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
         - name: Unarchive Kitty nightly
           ansible.builtin.unarchive:
-            src: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-x86_64.txz"
+            src: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
             dest: "{{ kitty_local }}"
             remote_src: true
           when: ( kitty_nightly_txz_sig.changed ) or ( kitty_nightly_txz.changed )
 
       when: kitty_version == "nightly"
+
+    - name: Local Desktop directory present
+      ansible.builtin.file:
+        path: ~/.local/share/applications
+        state: directory
+        mode: 0750
+
+    - name: Kitty desktop file in place
+      ansible.builtin.template:
+        src: kitty.desktop.j2
+        dest: ~/.local/share/applications/kitty.desktop.j2
+        mode: 0640
+
+    - name: Kitty symlink in place
+      ansible.builtin.file:
+        state: link
+        src: "{{ kitty_local }}/bin/kitty"
+        dest: "{{ kitty_bin }}/kitty"
+        mode: 0777
+
+    - name: Kitten symlink in place
+      ansible.builtin.file:
+        state: link
+        src: "{{ kitty_local }}/bin/kitten"
+        dest: "{{ kitty_bin }}/kitten"
+        mode: 0777
 
   when: kitty | bool
   tags:
