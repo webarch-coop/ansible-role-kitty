@@ -16,4 +16,5 @@ kitty_arch:
   armv8l: arm64
   i386: i686
   i686: i686
+kitty_gpg_imported: "gpg:              unchanged: 1"
 ...

@@ -40,9 +40,7 @@
     - name: GPG key imported
       ansible.builtin.command: "gpg --import {{ kitty_tmp }}/kovid.gpg"
       register: kitty_gpg_import
-      changed_when: >-
-        ( "unchanged" not in kitty_gpg_import.stderr_lines | last ) or
-        ( "not changed" not in kitty_gpg_import.stderr_lines | last )
+      changed_when: kitty_gpg_import.stderr_lines | last != kitty_gpg_imported
 
     - name: Check the latest version of Kitty
       ansible.builtin.uri:
