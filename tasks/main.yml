@@ -178,7 +178,7 @@
     - name: Kitty desktop file in place
       ansible.builtin.template:
         src: kitty.desktop.j2
-        dest: ~/.local/share/applications/kitty.desktop.j2
+        dest: ~/.local/share/applications/kitty.desktop
         mode: 0640
 
     - name: Kitty symlink in place

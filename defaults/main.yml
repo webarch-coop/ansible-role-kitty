@@ -10,7 +10,7 @@
 ---
 kitty: true
 kitty_bin: ~/.local/bin
-kitty_local: ~/.local/kitty-app
+kitty_local: ~/.local/kitty.app
 kitty_tmp: ~/tmp
 kitty_version: latest
 ...
