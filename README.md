@@ -1,4 +1,4 @@
-# Webarchitects Ansible Kitty Role
+# Webarchitects Kitty Ansible Role
 
 [![pipeline status](https://git.coop/webarch/kitty/badges/main/pipeline.svg)](https://git.coop/webarch/kitty/-/commits/main)
 
