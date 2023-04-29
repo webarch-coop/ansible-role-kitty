@@ -160,7 +160,7 @@
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
-        - name: Unarchive Kitty nightly
+        - name: Unarchive Kitty nightly  # noqa: no-handler
           ansible.builtin.unarchive:
             src: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
             dest: "{{ kitty_local }}"

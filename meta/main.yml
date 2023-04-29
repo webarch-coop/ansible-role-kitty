@@ -17,12 +17,12 @@ galaxy_info:
   license: GNU General Public License v3.0 (GPLv3)
   min_ansible_version: "2.10.7"
   platforms:
-    - name: debian
+    - name: Debian
       versions:
         - bookworm
         - bullseye
         - buster
-    - name: ubuntu
+    - name: Ubuntu
       versions:
         - focal
         - bionic

@@ -12,7 +12,7 @@ dependency:
   name: galaxy
 platforms:
   - name: instance
-    image: registry.git.coop/webarch/containers/images/ansible:0.20.0
+    image: registry.git.coop/webarch/containers/images/ansible:0.23.0
     pre_build_image: true
 provisioner:
   name: ansible
