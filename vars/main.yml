@@ -18,4 +18,7 @@ kitty_arch:
   i686: i686
 kitty_gpg_checksum: sha512:ca081a89522c0d719f0fe8209735a23fc778d870681c4d1cbcb6654fa685e36f1ced6640284ba6608570dce88289d3f5ea35cdc19b902abfcc8c3d9e0a2e2148
 kitty_gpg_imported: "gpg:              unchanged: 1"
+# https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
+kittyhostvars: "{{ dict(kittyvarnames | list | zip(q('vars', *kittyvarnames))) }}"
+kittyvarnames: "{{ q('varnames', '^kitty_') | sort }}"
 ...

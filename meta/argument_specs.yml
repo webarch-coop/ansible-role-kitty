@@ -18,10 +18,22 @@ argument_specs:
         type: bool
         required: true
         description: Run the tasks in this role.
+      kitty_arch:
+        type: dict
+        required: false
+        description: An internal dictonary of CPU architectures.
       kitty_bin:
         type: str
         required: true
         description: The Kitty binary directory.
+      kitty_gpg_checksum:
+        type: str
+        required: false
+        description: An internal variable for the sha512 checksum of the Kitty GPG public key.
+      kitty_gpg_imported:
+        type: str
+        required: false
+        description: An internal variable for the last line of standard error when the Kitty GPG public key is imported.
       kitty_local:
         type: str
         required: true

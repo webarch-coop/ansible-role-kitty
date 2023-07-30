@@ -207,6 +207,10 @@
         - "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
         - "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
         - "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
+      loop_control:
+        loop_var: kitty_tmp_file
+        label: "{{ kitty_tmp_file | ansible.builtin.basename }}"
+      when: ( kitty_required is defined ) or ( kitty_version == "nightly" )
 
   when: kitty | bool
   tags:
