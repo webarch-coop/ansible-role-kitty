@@ -22,9 +22,13 @@
         recurse: true
       register: molecule_user_tmp_find
 
+    - name: Set a fact for the files in the tmp directory
+      ansible.builtin.set_fact:
+        molecule_user_tmp_files: "{{ molecule_user_tmp_find | community.general.json_query('files[].path') }}"
+
     - name: Debug the files in the tmp directory
       ansible.builtin.debug:
-        var: molecule_user_tmp_find
+        var: molecule_user_tmp_files
 
     - name: Run which kitty
       ansible.builtin.command: which kitty
