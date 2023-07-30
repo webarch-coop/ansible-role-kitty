@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/kitty/badges/main/pipeline.svg)](https://git.coop/webarch/kitty/-/commits/main)
 
-Ansible role to install update [Kitty](https://github.com/kovidgoyal/kitty) in `~/.local` on Debian and Ubuntu.
+Ansible role to install update [Kitty](https://github.com/kovidgoyal/kitty) in `~/.local` on Debian and Ubuntu (it might work on other Linux distros but it has only been tested on these two).
 
 This repo can be used to install and update the [latest version](https://github.com/kovidgoyal/kitty/releases/latest), or the [nightly version](https://github.com/kovidgoyal/kitty/releases/tag/nightly) or a [specific version](https://github.com/kovidgoyal/kitty/releases) of [Kitty](https://github.com/kovidgoyal/kitty) equal to or newer than `0.20.3` (earlier versions did not have GPG signatures).
 
@@ -28,13 +28,13 @@ export PATH="${PATH}"
 
 See the [defaults/main.yml](defaults/main.yml) file for the default variables, the [vars/main.yml](vars/main.yml) file for the preset variables and the [meta/argument_specs.yml](meta/argument_specs.yml) file for the variable specification.
 
-| Variable name        | Default value                             | Comment                                                                   |
-|----------------------|-------------------------------------------|---------------------------------------------------------------------------|
-| `kitty`              | `true`                                    | If this variable is set to `false` all tasks in this role will be skipped |
-| `kitty_bin`          | `{{ ansible_env.HOME }}/.local/bin`       | The directory in which the `kitty` binary resides                         |
-| `kitty_local`        | `{{ ansible_env.HOME }}/.local/kitty.app` | The directory that the Kitty archive is extracted into                    |
-| `kitty_tmp`          | `{{ ansible_env.HOME }}/tmp`              | The directory that the Kitty archive and GPG signature to downloaded into |
-| `kitty_version`      | `latest`                                  | Valid options are `latest`, `nightly` or a version number, eg `0.20.3`    |
+| Variable name        | Default value                             | Comment                                                                    |
+|----------------------|-------------------------------------------|----------------------------------------------------------------------------|
+| `kitty`              | `true`                                    | If this variable is set to `false` all tasks in this role will be skipped. |
+| `kitty_bin`          | `{{ ansible_env.HOME }}/.local/bin`       | The directory in which the `kitty` binary resides.                         |
+| `kitty_local`        | `{{ ansible_env.HOME }}/.local/kitty.app` | The directory that the Kitty archive is extracted into.                    |
+| `kitty_tmp`          | `{{ ansible_env.HOME }}/tmp`              | The directory that the Kitty archive and GPG signature to downloaded into. |
+| `kitty_version`      | `latest`                                  | Valid options are `latest`, `nightly` or a version number, eg `0.20.3`.    |
 
 The variable `ansible_env.HOME` is the `$HOME` directory of the user running Ansible.
 
@@ -46,7 +46,7 @@ Install the [kitty-terminfo](https://packages.debian.org/search?keywords=kitty-t
 
 To ensure that [ctrl+shift+v goes to Vim](https://github.com/kovidgoyal/kitty/discussions/5003#discussioncomment-2617442) add the following to `~/.config/kitty/kitty.conf`:
 
-```
+```kitty
 map ctrl+shift+v send_text all \x16
 ```
 
