@@ -8,14 +8,29 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-kitty_arch:
-  x86_64: x86_64
-  aarch64: arm64
-  aarch64_be: arm64
-  armv8b: arm64
-  armv8l: arm64
-  i386: i686
-  i686: i686
-kitty_gpg_checksum: sha512:ca081a89522c0d719f0fe8209735a23fc778d870681c4d1cbcb6654fa685e36f1ced6640284ba6608570dce88289d3f5ea35cdc19b902abfcc8c3d9e0a2e2148
-kitty_gpg_imported: "gpg:              unchanged: 1"
+- name: Run as user
+  become: false
+  connection: local
+  gather_facts: true
+  hosts:
+    - localhost
+  tasks:
+
+    - name: Debug ansible_effective_user_id
+      ansible.builtin.debug:
+        var: ansible_effective_user_id
+
+    - name: Debug ansible_user_id
+      ansible.builtin.debug:
+        var: ansible_user_id
+
+    - name: Debug ansible_user_dir
+      ansible.builtin.debug:
+        var: ansible_user_dir
+
+    - name: Include kitty role as user
+      ansible.builtin.include_role:
+        name: kitty
+      vars:  # noqa var-naming[no-role-prefix]
+        kitty: true
 ...

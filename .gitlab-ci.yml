@@ -8,17 +8,51 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-image: registry.git.coop/webarch/containers/images/ansible:0.23.0
 variables:
-  PY_COLORS: "1"
+  ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
   ANSIBLE_FORCE_COLOR: "1"
+  GIT_STRATEGY: none
+  MOLECULE_VERBOSITY: "0"
+  PY_COLORS: "1"
 before_script:
-  - chmod 700 $(pwd)
+  - cd
+  - source ~/.profile
+  - mkdir -p builds/${CI_PROJECT_ROOT_NAMESPACE}
+  - cd builds/${CI_PROJECT_ROOT_NAMESPACE}
+  - git clone ${CI_PROJECT_URL}.git
+  - cd ${CI_PROJECT_NAME}
+  - pwd
+  - cat /etc/debian_version
+  - which ansible
+  - ansible --version
+  - which yamllint
+  - yamllint --version
+  - which molecule
+  - molecule --version
 stages:
-  - lint
-lint:
-  stage: lint
+  - trixie
+  - bookworm
+  - bullseye
+  - jammy
+trixie:
+  image: registry.git.coop/webarch/containers/images/trixie:20230713
+  stage: trixie
   script:
-    - molecule lint
+    - molecule test
+bookworm:
+  image: registry.git.coop/webarch/containers/images/bookworm:20230713
+  stage: bookworm
+  script:
+    - molecule test
+bullseye:
+  image: registry.git.coop/webarch/containers/images/bullseye:20230713
+  stage: bullseye
+  script:
+    - molecule test
+jammy:
+  image: registry.git.coop/webarch/containers/images/jammy:20230713
+  stage: jammy
+  script:
+    - molecule test
 # vim: syntax=yaml
 ...

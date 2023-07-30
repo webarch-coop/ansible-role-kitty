@@ -1,0 +1,56 @@
+# Copyright 2022-2023 Chris Croome
+#
+# This file is part of the Webarchitects Kitty Ansible role.
+#
+# The Webarchitects Kitty Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Kitty Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Verify as user
+  become: false
+  connection: local
+  gather_facts: true
+  hosts:
+    - localhost
+  tasks:
+
+    - name: Run which kitty
+      ansible.builtin.command: which kitty
+      environment:
+        PATH: "{{ ansible_user_dir }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+      check_mode: false
+      changed_when: false
+      register: molecule_user_which_kitty
+
+    - name: Debug which kitty
+      ansible.builtin.debug:
+        var: molecule_user_which_kitty.stdout
+
+    - name: Run which kitty -a
+      ansible.builtin.command: which kitty -a
+      check_mode: false
+      changed_when: false
+      register: molecule_user_which_kitty_a
+      failed_when: molecule_user_which_kitty_a.rc is not regex('^0|1$')
+
+    - name: Check kitty versions
+      ansible.builtin.command: "{{ molecule_kitty_path }} --version"
+      environment:
+        PATH: "{{ ansible_user_dir }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+      check_mode: false
+      changed_when: false
+      register: molecule_kitty_v
+      loop: "{{ molecule_user_which_kitty_a.stdout_lines }}"
+      loop_control:
+        loop_var: molecule_kitty_path
+
+    - name: Set facts for the kitty versions
+      ansible.builtin.set_fact:
+        molecule_kitty_user_versions: "{{ molecule_kitty_v | community.general.json_query('results[].{path: molecule_kitty_path, version: stdout_lines[0]}') }}"
+
+    - name: Debug kitty versions
+      ansible.builtin.debug:
+        var: molecule_kitty_user_versions
+...

@@ -1,0 +1,39 @@
+# Copyright 2022-2023 Chris Croome
+#
+# This file is part of the Webarchitects Kitty Ansible role.
+#
+# The Webarchitects Kitty Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Kitty Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Verify Kitty variables
+  block:
+
+    - name: Debug the hostvars variable names that start with kitty_
+      ansible.builtin.debug:
+        var: kittyvarnames
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+
+    - name: Debug the hostvars variable names that start with kitty_
+      ansible.builtin.debug:
+        var: kittyhostvars
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+
+    - name: Check kitty_ variables using meta/argument_specs.yml
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
+        provided_arguments: "{{ kittyhostvars }}"
+
+    - name: Check the Kitty version variable
+      ansible.builtin.assert:
+        that: >-
+          ( kitty_version == "latest" ) or
+          ( kitty_version == "nightly" ) or
+          ( kitty_version is version('0.20.3', '>') )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+  tags:
+    - wpcli
+...

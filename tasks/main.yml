@@ -8,16 +8,18 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+- name: Skip the tasks in this role as kitty is false
+  ansible.builtin.debug:
+    msg: "The kitty variable need to be true for the tasks in this role to run."
+  when: not kitty | bool
+  tags:
+    - kitty
+
 - name: Install Kitty
   block:
 
-    - name: Check the Kitty version variable
-      ansible.builtin.assert:
-        that: >-
-          ( kitty_version == "latest" ) or
-          ( kitty_version == "nightly" ) or
-          ( kitty_version is version('0.20.3', '>') )
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+    - name: Include verify variables tasks
+      ansible.builtin.include_tasks: verify.yml
 
     - name: Directories present
       ansible.builtin.file:
@@ -32,8 +34,9 @@
         loop_var: kitty_dir
 
     - name: GPG public key present
-      ansible.builtin.copy:
-        src: kovid.gpg
+      ansible.builtin.get_url:
+        url: https://calibre-ebook.com/signatures/kovid.gpg
+        checksum: "{{ kitty_gpg_checksum }}"
         dest: "{{ kitty_tmp }}/kovid.gpg"
         mode: "0640"
 
@@ -194,6 +197,16 @@
         src: "{{ kitty_local }}/bin/kitten"
         dest: "{{ kitty_bin }}/kitten"
         mode: "0777"
+
+    - name: Clean up Kitty downloads
+      ansible.builtin.file:
+        path: "{{ kitty_tmp_file }}"
+        state: absent
+      loop:
+        - "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+        - "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
+        - "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+        - "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
 
   when: kitty | bool
   tags:
