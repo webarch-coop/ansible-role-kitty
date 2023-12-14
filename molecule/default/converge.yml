@@ -8,10 +8,10 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Run as user
-  become: false
+- name: Run as root
+  # become: false
   connection: local
-  gather_facts: true
+  # gather_facts: true
   hosts:
     - localhost
   tasks:
@@ -28,7 +28,7 @@
       ansible.builtin.debug:
         var: ansible_user_dir
 
-    - name: Include kitty role as user
+    - name: Include kitty role as root
       ansible.builtin.include_role:
         name: kitty
       vars:  # noqa var-naming[no-role-prefix]

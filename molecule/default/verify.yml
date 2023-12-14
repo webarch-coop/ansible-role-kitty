@@ -8,8 +8,8 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Verify as user
-  become: false
+- name: Verify as root
+  # become: false
   connection: local
   gather_facts: true
   hosts:
@@ -18,7 +18,7 @@
 
     - name: Check what files are in the tmp directory
       ansible.builtin.find:
-        paths: /home/ansible/tmp
+        paths: "{{ ansible_user_dir }}/tmp"
         recurse: true
       register: molecule_user_tmp_find
 
