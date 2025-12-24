@@ -16,21 +16,26 @@
     - localhost
   tasks:
 
-    - name: Debug ansible_effective_user_id
+    - name: Debug ansible_facts.effective_user_id
       ansible.builtin.debug:
-        var: ansible_effective_user_id
+        var: ansible_facts.effective_user_id
 
-    - name: Debug ansible_user_id
+    - name: Debug ansible_facts.user_id
       ansible.builtin.debug:
-        var: ansible_user_id
+        var: ansible_facts.user_id
 
-    - name: Debug ansible_user_dir
+    - name: Debug ansible_facts.user_dir
       ansible.builtin.debug:
-        var: ansible_user_dir
+        var: ansible_facts.user_dir
 
-    - name: Include kitty role as root
+    - name: Include kitty role
       ansible.builtin.include_role:
         name: kitty
       vars:  # noqa var-naming[no-role-prefix]
         kitty: true
+
+    - name: Include Kitty role argument spec checks
+      ansible.builtin.include_role:
+        name: kitty
+        tasks_from: verify.yml
 ...

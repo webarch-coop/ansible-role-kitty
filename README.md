@@ -31,12 +31,12 @@ See the [defaults/main.yml](defaults/main.yml) file for the default variables, t
 | Variable name        | Default value                             | Comment                                                                    |
 |----------------------|-------------------------------------------|----------------------------------------------------------------------------|
 | `kitty`              | `true`                                    | If this variable is set to `false` all tasks in this role will be skipped. |
-| `kitty_bin`          | `{{ ansible_env.HOME }}/.local/bin`       | The directory in which the `kitty` binary resides.                         |
-| `kitty_local`        | `{{ ansible_env.HOME }}/.local/kitty.app` | The directory that the Kitty archive is extracted into.                    |
-| `kitty_tmp`          | `{{ ansible_env.HOME }}/tmp`              | The directory that the Kitty archive and GPG signature to downloaded into. |
+| `kitty_bin`          | `{{ ansible_facts.env.HOME }}/.local/bin`       | The directory in which the `kitty` binary resides.                         |
+| `kitty_local`        | `{{ ansible_facts.env.HOME }}/.local/kitty.app` | The directory that the Kitty archive is extracted into.                    |
+| `kitty_tmp`          | `{{ ansible_facts.env.HOME }}/tmp`              | The directory that the Kitty archive and GPG signature to downloaded into. |
 | `kitty_version`      | `latest`                                  | Valid options are `latest`, `nightly` or a version number, eg `0.20.3`.    |
 
-The variable `ansible_env.HOME` is the `$HOME` directory of the user running Ansible.
+The variable `ansible_facts.env.HOME` is the `$HOME` directory of the user running Ansible.
 
 ## Remote servers
 

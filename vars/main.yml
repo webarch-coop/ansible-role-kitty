@@ -8,6 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+ansible_managed: Ansible managed
 kitty_arch:
   x86_64: x86_64
   aarch64: arm64

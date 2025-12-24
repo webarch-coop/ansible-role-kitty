@@ -8,7 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Verify as root
+- name: Verify
   # become: false
   connection: local
   gather_facts: true
@@ -18,7 +18,7 @@
 
     - name: Check what files are in the tmp directory
       ansible.builtin.find:
-        paths: "{{ ansible_user_dir }}/tmp"
+        paths: "{{ ansible_facts.user_dir }}/tmp"
         recurse: true
       register: molecule_user_tmp_find
 
@@ -33,7 +33,7 @@
     - name: Run which kitty
       ansible.builtin.command: which kitty
       environment:
-        PATH: "{{ ansible_user_dir }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+        PATH: "{{ ansible_facts.user_dir }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
       check_mode: false
       changed_when: false
       register: molecule_user_which_kitty
@@ -52,7 +52,7 @@
     - name: Check kitty versions
       ansible.builtin.command: "{{ molecule_kitty_path }} --version"
       environment:
-        PATH: "{{ ansible_user_dir }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+        PATH: "{{ ansible_facts.user_dir }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
       check_mode: false
       changed_when: false
       register: molecule_kitty_v

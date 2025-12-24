@@ -10,21 +10,18 @@
 ---
 dependency:
   name: galaxy
+  options:
+    force: true
 platforms:
   - name: instance
 provisioner:
   name: ansible
   config_options:
     defaults:
-      ansible_managed: Ansible managed
-    # host_vars:
-    #   instance:
-    #     ansible_user: ansible
+      duplicate_dict_key: error
+      inject_facts_as_vars: false
   options:
     D: true
 verifier:
   name: ansible
-    # host_vars:
-    #   instance:
-    #     ansible_user: ansible
 ...

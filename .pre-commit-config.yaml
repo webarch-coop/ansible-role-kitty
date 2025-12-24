@@ -15,12 +15,23 @@ repos:
     hooks:
       - id: yamllint
         name: YAML Lint
+  # https://github.com/aristanetworks/j2lint/releases
+  - repo: https://github.com/aristanetworks/j2lint.git
+    rev: v1.2.0
+    hooks:
+      - id: j2lint
+        name: Jinja2-Linter
+        args:
+          - templates
   # https://github.com/jackdewinter/pymarkdown/releases
   - repo: https://github.com/jackdewinter/pymarkdown.git
     rev: v0.9.34
     hooks:
       - id: pymarkdown
         name: Markdown Lint
+        args:
+          - scan
+          - README.md
   # https://github.com/ansible/ansible-lint/releases
   - repo: https://github.com/ansible/ansible-lint.git
     rev: v25.12.1
