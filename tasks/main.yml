@@ -57,7 +57,7 @@
 
     - name: Set a fact for the latest version of Kitty
       ansible.builtin.set_fact:
-        kitty_latest: "{{ kitty_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+        kitty_latest: "{{ kitty_headers.location | ansible.builtin.urlsplit('path') | ansible.builtin.basename | ansible.builtin.regex_replace('^v') }}"
 
     - name: Check if Kitty is installed
       ansible.builtin.stat:
@@ -75,7 +75,7 @@
 
         - name: Set a variable for the installed version of Kitty
           ansible.builtin.set_fact:
-            kitty_installed: "{{ kitty_installed_version.stdout.split(' ')[1] | trim | string }}"
+            kitty_installed: "{{ kitty_installed_version.stdout.split(' ')[1] | ansible.builtin.trim | ansible.builtin.string }}"
 
         - name: The latest version of Kitty is installed
           ansible.builtin.debug:

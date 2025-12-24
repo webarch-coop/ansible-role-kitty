@@ -34,6 +34,10 @@ argument_specs:
         type: dict
         required: false
         description: Results from using the ansible.builtin.uri module to do a HTTP HEAD request on the GitHub latest package URL.
+      kitty_installed:
+        type: str
+        required: false
+        description: The installed Kitty version number.
       kitty_installed_version:
         type: dict
         required: false
