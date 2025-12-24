@@ -14,6 +14,14 @@ argument_specs:
     description: An Ansible role for installing Kitty.
     short_description: The main entry point for the Ansible role.
     options:
+      kitty_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the argument spec.
+      kitty_combined_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the combined argument spec.
       kitty_gpg_import:
         type: dict
         required: false
@@ -30,6 +38,10 @@ argument_specs:
         type: dict
         required: false
         description: Results form running kitty --version.
+      kitty_internal_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the internal argument spec.
       kitty_latest:
         type: str
         required: false
