@@ -1,0 +1,53 @@
+# Copyright 2022-2025 Chris Croome
+#
+# This file is part of the Webarchitects Kitty Ansible role.
+#
+# The Webarchitects Kitty Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Kitty Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Kitty Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: An Ansible role for installing Kitty.
+    short_description: The main entry point for the Ansible role.
+    options:
+      kitty_gpg_import:
+        type: dict
+        required: false
+        description: Result from running gpg --import with the Kitty GPG public key.
+      kitty_gpg_verify:
+        type: dict
+        required: false
+        description: Result from running gpg --verify with the Kitty package and GPG public signature.
+      kitty_headers:
+        type: dict
+        required: false
+        description: Results from using the ansible.builtin.uri module to do a HTTP HEAD request on the GitHub latest package URL.
+      kitty_installed_version:
+        type: dict
+        required: false
+        description: Results form running kitty --version.
+      kitty_latest:
+        type: str
+        required: false
+        description: The latest Kitty version number.
+      kitty_nightly_txz:
+        type: dict
+        required: false
+        description: Results from downloading the the Kitty txz archive.
+      kitty_nightly_txz_sig:
+        type: dict
+        required: false
+        description: Results from downloading the the Kitty txz GPG signature.
+      kitty_present:
+        type: dict
+        required: false
+        description: The result from running ansible.builtin.stat in the Kitty binary.
+      kitty_required:
+        type: dict
+        required: false
+        description: The required Kitty version number.
+...

@@ -21,9 +21,21 @@
         var: kittyhostvars
         verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
-    - name: Check kitty_ variables using meta/argument_specs.yml
+    - name: Set a fact for the argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        kitty_argument_spec: "{{ kitty_argument_spec_lookup | ansible.builtin.from_yaml }}"
+        kitty_internal_argument_spec: "{{ kitty_internal_argument_spec_lookup | ansible.builtin.from_yaml }}"
+      vars:
+        kitty_argument_spec_lookup: "{{ lookup('ansible.builtin.file', 'meta/argument_specs.yml', errors='strict') }}"
+        kitty_internal_argument_spec_lookup: "{{ lookup('ansible.builtin.file', 'meta/internal_argument_specs.yml', errors='strict') }}"
+
+    - name: Set a fact for the combined argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        kitty_combined_argument_spec: "{{ kitty_argument_spec | ansible.builtin.combine(kitty_internal_argument_spec, recursive=true) }}"
+
+    - name: Check kitty_ variables using the combined argument spec
       ansible.builtin.validate_argument_spec:
-        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
+        argument_spec: "{{ kitty_combined_argument_spec['argument_specs']['main']['options'] }}"
         provided_arguments: "{{ kittyhostvars }}"
 
     - name: Check the Kitty version variable
