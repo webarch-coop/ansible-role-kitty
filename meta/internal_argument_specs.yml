@@ -59,7 +59,7 @@ argument_specs:
         required: false
         description: The result from running ansible.builtin.stat in the Kitty binary.
       kitty_required:
-        type: dict
+        type: str
         required: false
         description: The required Kitty version number.
 ...
