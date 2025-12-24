@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Chris Croome
+# Copyright 2022-2025 Chris Croome
 #
 # This file is part of the Webarchitects Kitty Ansible role.
 #
@@ -113,25 +113,25 @@
 
         - name: Download Kitty GPG sig
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
-            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
             mode: "0640"
 
         - name: Download Kitty
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
-            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/v{{ kitty_required }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz"
+            dest: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz"
             mode: "0640"
 
         - name: Check GPG sig
-          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
           register: kitty_gpg_verify
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
         - name: Unarchive Kitty
           ansible.builtin.unarchive:
-            src: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
+            src: "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz"
             dest: "{{ kitty_local }}"
             remote_src: true
 
@@ -145,27 +145,27 @@
 
         - name: Download Kitty nightly GPG sig
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-{{ kitty_arch[ansible_architecture] }}.txz.sig"
-            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
+            dest: "{{ kitty_tmp }}/kitty-{{ ansible_facts.date_time.date }}-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
             mode: "0640"
           register: kitty_nightly_txz_sig
 
         - name: Download nightly Kitty
           ansible.builtin.get_url:
-            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-{{ kitty_arch[ansible_architecture] }}.txz"
-            dest: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
+            url: "https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-{{ kitty_arch[ansible_facts.architecture] }}.txz"
+            dest: "{{ kitty_tmp }}/kitty-{{ ansible_facts.date_time.date }}-{{ kitty_arch[ansible_facts.architecture] }}.txz"
             mode: "0640"
           register: kitty_nightly_txz
 
         - name: Check GPG sig
-          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
+          ansible.builtin.command: "gpg --verify {{ kitty_tmp }}/kitty-{{ ansible_facts.date_time.date }}-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
           register: kitty_gpg_verify
           changed_when: false
           failed_when: ( "Good signature" not in kitty_gpg_verify.stderr )
 
         - name: Unarchive Kitty nightly  # noqa: no-handler
           ansible.builtin.unarchive:
-            src: "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
+            src: "{{ kitty_tmp }}/kitty-{{ ansible_facts.date_time.date }}-{{ kitty_arch[ansible_facts.architecture] }}.txz"
             dest: "{{ kitty_local }}"
             remote_src: true
           when: ( kitty_nightly_txz_sig.changed ) or ( kitty_nightly_txz.changed )
@@ -203,10 +203,10 @@
         path: "{{ kitty_tmp_file }}"
         state: absent
       loop:
-        - "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
-        - "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_architecture] }}.txz"
-        - "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz.sig"
-        - "{{ kitty_tmp }}/kitty-{{ ansible_date_time.date }}-{{ kitty_arch[ansible_architecture] }}.txz"
+        - "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
+        - "{{ kitty_tmp }}/kitty-{{ kitty_required }}-{{ kitty_arch[ansible_facts.architecture] }}.txz"
+        - "{{ kitty_tmp }}/kitty-{{ ansible_facts.date_time.date }}-{{ kitty_arch[ansible_facts.architecture] }}.txz.sig"
+        - "{{ kitty_tmp }}/kitty-{{ ansible_facts.date_time.date }}-{{ kitty_arch[ansible_facts.architecture] }}.txz"
       loop_control:
         loop_var: kitty_tmp_file
         label: "{{ kitty_tmp_file | ansible.builtin.basename }}"

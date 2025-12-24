@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Chris Croome
+# Copyright 2022-2025 Chris Croome
 #
 # This file is part of the Webarchitects Kitty Ansible role.
 #
@@ -10,13 +10,21 @@
 ---
 variables:
   ANSIBLE_CALLBACK_RESULT_FORMAT: "yaml"
+  ANSIBLE_DEFAULT_VERBOSITY: "1"
+  ANSIBLE_DIFF_ALWAYS: "1"
   ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
   ANSIBLE_FORCE_COLOR: "1"
+  ANSIBLE_INJECT_FACT_VARS: "0"
+  ANSIBLE_NOCOWS: "1"
   ANSIBLE_REMOTE_TMP: "/tmp"
+  ANSIBLE_ROLES_PATH: "${CI_PROJECT_DIR}/..:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles"
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
-  DEFAULT_MANAGED_STR: "Ansible managed"
+  DEBIAN_FRONTEND: noninteractive
   MOLECULE_VERBOSITY: "0"
+  PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  PRE_COMMIT_COLOR: always
   PY_COLORS: "1"
+  USER: "root"
 before_script:
   - whoami
   - pwd
@@ -30,26 +38,28 @@ before_script:
 stages:
   - trixie
   - bookworm
-  # - bullseye
-  - jammy
+  - forky
+  - noble
 trixie:
-  image: registry.git.coop/webarch/containers/images/trixie:20231213
+  image: registry.git.coop/webarch/containers/images/trixie:20251204
   stage: trixie
   script:
+    - pre-commit install
+    - pre-commit run --all-files
     - molecule test
 bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20231213
+  image: registry.git.coop/webarch/containers/images/bookworm:20251204
   stage: bookworm
   script:
     - molecule test
-# bullseye:
-#   image: registry.git.coop/webarch/containers/images/bullseye:20231213
-#   stage: bullseye
-#   script:
-#     - molecule test
-jammy:
-  image: registry.git.coop/webarch/containers/images/jammy:20231213
-  stage: jammy
+forky:
+  image: registry.git.coop/webarch/containers/images/forky:20251204
+  stage: forky
+  script:
+    - molecule test
+noble:
+  image: registry.git.coop/webarch/containers/images/noble:20251204
+  stage: noble
   script:
     - molecule test
 ...
